@@ -25,6 +25,25 @@ def full_screen_image(image, resolution_video=(1920,1080)) :
     final_image.paste(image, (int((resolution_video[1]-image.size[0])/2),0))
     return final_image
 
+def read_script_file(script_path) :
+    script_infos = {}
+    with open(script_path) as f :
+        lines = f.readlines()
+    #Clean list
+    lines = [x.replace("\n", "") for x in lines]
+
+    #Add list to info dict
+    script_infos["Perso1"] = lines[0].split(" ")[0]
+    script_infos["Perso2"] = lines[0].split(" ")[2]
+
+    script_infos["Song"] = lines[1]
+
+    script_infos["Comparison"] = []
+    for i in range(2, len(lines)) :
+        script_infos["Comparison"].append(lines[i].split(" "))
+
+    return script_infos
+
 def create_video_frames(part_of_video, count_img, image1, image2, resolution_video =(1920,1080), folder_video_images = "Temp", fps=30) :
     for j in range(0, len(part_of_video)-1) :
         if j == 0 :
@@ -41,7 +60,7 @@ def create_video_frames(part_of_video, count_img, image1, image2, resolution_vid
                 count_img+=1
     return count_img
 
-def WriteVideo(pathFolderImages, numberOfFrames, fps=30.0) :
+def write_video(pathFolderImages, numberOfFrames, fps=30.0) :
     image_files = []
     for i in range(0, numberOfFrames) :
         image_files.append(pathFolderImages + "/frame" + str(i) +".jpg")
@@ -49,26 +68,35 @@ def WriteVideo(pathFolderImages, numberOfFrames, fps=30.0) :
     clip.write_videofile('project.mp4', codec="libx264", remove_temp= True, fps=fps)
 
 
-def CompileSoundandAudio(pathFileVideo, pathFileAudio):
-    finalVid = mpy.VideoFileClip(pathFileVideo)
-    finalAudio = mpy.AudioFileClip(pathFileAudio)
+def compile_sound_video(path_file_video, path_file_audio):
+    final_vid = mpy.VideoFileClip(path_file_video)
+    final_audio = mpy.AudioFileClip(path_file_audio)
 
-    new_audioClip = mpy.CompositeAudioClip([finalAudio])
+    new_audioClip = mpy.CompositeAudioClip([final_audio])
 
-    finalVid = finalVid.set_audio(new_audioClip)
-    finalVid.write_videofile("finalVideo.mp4", codec='libx264', audio_codec="aac")
+    final_vid = final_vid.set_audio(new_audioClip)
+    final_vid.write_videofile("finalVideo.mp4", codec='libx264', audio_codec="aac")
 
+def load_image_perso(path_perso) :
+    img_perso  = Image.open(path_perso + "/pic1.jpg")
+    return img_perso
+
+def load_video_perso(path_perso) :
+    pass
 
 def main() :
 
     part_of_video = [0,3,4,5,6,7,8,9]
     fps = 30
     folder_video_images = "Temp"
+    res_folder_path = "Res"
     count_img = 0
     resolution_video = (1920,1080)
+    #Read Script
+    script_infos = read_script_file('Res/script.txt')
     #Import images
-    image2 = Image.open("boa.jpg")
-    image1 = Image.open("flamingo.jpg")
+    image1 = load_image_perso(res_folder_path + "/" + script_infos["Perso1"])
+    image2 = load_image_perso(res_folder_path + "/" + script_infos["Perso2"])
     #Resize them
     new_height = int(resolution_video[0]/2)
     image1 = image1.resize((int(new_height * image1.size[0] / image1.size[1]) , new_height) )
@@ -76,9 +104,9 @@ def main() :
     #Create video frames
     count_img = create_video_frames(part_of_video,count_img,image1,image2,resolution_video,folder_video_images,fps)
     #Concatenate images into video
-    WriteVideo(folder_video_images, count_img)
+    write_video(folder_video_images, count_img)
     #Add music to the video
-    CompileSoundandAudio("project.mp4", "soundtrack.wav")
+    compile_sound_video("project.mp4", res_folder_path + "/" + script_infos["Song"] + "/soundtrack.wav")
 
 if __name__ == '__main__':
     main()
