@@ -44,27 +44,94 @@ def read_script_file(script_path) :
 
     return script_infos
 
-def create_video_frames(part_of_video, count_img, image1, image2, resolution_video =(1920,1080), folder_video_images = "Temp", fps=30) :
-    for j in range(0, len(part_of_video)-1) :
+def create_video_frames_img(part_of_video, count_img, image1, image2, script_infos,resolution_video =(1920,1080), folder_video_images = "Temp", fps=30) :
+    j = 0
+    k = 0
+    while j < len(part_of_video)-1 and k < len(script_infos["Comparison"]) :
         if j == 0 :
+            img = combine_image(image1, image2, script_infos["Perso1"].split("/")[-1] + " VS " + script_infos["Perso2"].split("/")[-1], resolution_video)
             for i in range(0, (part_of_video[1] - part_of_video[0]) * fps):
-                combine_image(image1, image2, "BOA VS DON FLAMINGO", resolution_video).save(folder_video_images + "/frame" + str(count_img) + ".jpg")
+                img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
                 count_img+=1
         elif j % 2 == 1 :
+            img = combine_image(image1, image2, script_infos["Comparison"][k][0], resolution_video)
             for i in range(0, (part_of_video[j+1] - part_of_video[j]) * fps):
-                combine_image(image1, image2, "STRENGTH", resolution_video).save(folder_video_images + "/frame" + str(count_img) + ".jpg")
+                img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
                 count_img+=1
         else :
+            if (int(script_infos["Comparison"][k][1]) == 1) :
+                img = full_screen_image(image1)
+            else :
+                img = full_screen_image(image2)
+
             for i in range(0, (part_of_video[j+1] - part_of_video[j]) * fps):
-                full_screen_image(image1).save(folder_video_images + "/frame" + str(count_img) + ".jpg")
+                img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
                 count_img+=1
+            k+=1
+        j+=1
     return count_img
 
-def write_video(pathFolderImages, numberOfFrames, fps=30.0) :
+def create_video_frames_vid(part_of_video, count_img, image_list1, image_list2, script_infos, resolution_video =(1920,1080), folder_video_images = "Temp", fps=30) :
+    j = 0
+    k = 0
+    while j < len(part_of_video)-1 and k < len(script_infos["Comparison"]) :
+        index_list1 = 0
+        index_list2 = 0
+        if j == 0 :
+            for i in range(0, (int(part_of_video[1] - part_of_video[0]) * fps)):
+                img = combine_image(image_list1[index_list1], image_list2[index_list2], script_infos["Perso1"].split("/")[-1] + " VS " + script_infos["Perso2"].split("/")[-1], resolution_video)
+                img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
+                count_img+=1
+
+                index_list1 += 1
+                index_list2 += 1
+                if index_list2 >= len(image_list2) :
+                    index_list2 = 0
+                if index_list1 >= len(image_list1) :
+                    index_list1 = 0
+
+        elif j % 2 == 1 :
+            for i in range(0, int((part_of_video[j+1] - part_of_video[j]) * fps)):
+                img = combine_image(image_list1[index_list1], image_list2[index_list2],script_infos["Comparison"][k][0], resolution_video)
+                img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
+                count_img+=1
+
+                index_list1 += 1
+                index_list2 += 1
+                if index_list2 >= len(image_list2) :
+                    index_list2 = 0
+                if index_list1 >= len(image_list1) :
+                    index_list1 = 0
+        else :
+            for i in range(0, int((part_of_video[j+1] - part_of_video[j]) * fps)):
+
+                if (int(script_infos["Comparison"][k][1]) == 1):
+                    img = full_screen_image(image_list1[index_list1])
+                else:
+                    img = full_screen_image(image_list2[index_list2])
+
+                img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
+
+                count_img+=1
+
+                index_list1 += 1
+                index_list2 += 1
+                if index_list2 >= len(image_list2) :
+                    index_list2 = 0
+                if index_list1 >= len(image_list1) :
+                    index_list1 = 0
+            k+=1
+        j+=1
+    return count_img
+
+def write_video(pathFolderImages, numberOfFrames, audio_path, fps=30.0) :
     image_files = []
     for i in range(0, numberOfFrames) :
         image_files.append(pathFolderImages + "/frame" + str(i) +".jpg")
     clip = mpy.ImageSequenceClip(image_files, fps=fps)
+    audio_clip = mpy.AudioFileClip(audio_path).set_duration(clip.duration)
+    new_audio_clip = mpy.CompositeAudioClip([audio_clip])
+    clip = clip.set_audio(new_audio_clip)
     clip.write_videofile('project.mp4', codec="libx264", remove_temp= True, fps=fps)
 
 
@@ -81,12 +148,38 @@ def load_image_perso(path_perso) :
     img_perso  = Image.open(path_perso + "/pic1.jpg")
     return img_perso
 
-def load_video_perso(path_perso) :
-    pass
+def load_video_perso(path_perso, lenmax=-1) :
+    img_list_perso = []
+    cap = cv2.VideoCapture(path_perso + "/vid1.mp4")
+    count = 0
+    if lenmax == -1 :
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            pil_img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            img_list_perso.append(pil_img)
+    else :
+        while count < lenmax:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            pil_img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            img_list_perso.append(pil_img)
+            count+=1
+    return img_list_perso
+
+def load_timestamps(path_song) :
+    with open(path_song + "/timestamps.txt") as f :
+        lines = f.readlines()
+    #Clean list
+    timestamps_list = lines[0].replace("\n", "").split(",")
+    timestamps_list = [ float(x) for x in timestamps_list]
+    return timestamps_list
 
 def main() :
 
-    part_of_video = [0,3,4,5,6,7,8,9]
+
     fps = 30
     folder_video_images = "Temp"
     res_folder_path = "Res"
@@ -94,19 +187,23 @@ def main() :
     resolution_video = (1920,1080)
     #Read Script
     script_infos = read_script_file('Res/script.txt')
+    #Import song and timestamps
+    part_of_video = load_timestamps(res_folder_path + "/" + script_infos["Song"])
     #Import images
-    image1 = load_image_perso(res_folder_path + "/" + script_infos["Perso1"])
-    image2 = load_image_perso(res_folder_path + "/" + script_infos["Perso2"])
+    image_list1 = load_video_perso(res_folder_path + "/" + script_infos["Perso1"], 90)
+    image_list2 = load_video_perso(res_folder_path + "/" + script_infos["Perso2"], 90)
     #Resize them
-    new_height = int(resolution_video[0]/2)
-    image1 = image1.resize((int(new_height * image1.size[0] / image1.size[1]) , new_height) )
-    image2 = image2.resize((int(new_height * image2.size[0] / image2.size[1]), new_height))
+    new_height = int(resolution_video[0] / 2)
+    for i in range(0, len(image_list1)) :
+        image_list1[i] = image_list1[i].resize((int(new_height * image_list1[i].size[0] / image_list1[i].size[1]) , new_height) )
+    for j in range(0, len(image_list2)) :
+        image_list2[j] = image_list2[j].resize((int(new_height * image_list2[j].size[0] / image_list2[j].size[1]), new_height))
     #Create video frames
-    count_img = create_video_frames(part_of_video,count_img,image1,image2,resolution_video,folder_video_images,fps)
+    count_img = create_video_frames_vid(part_of_video,count_img,image_list1,image_list2,script_infos,resolution_video,folder_video_images,fps)
     #Concatenate images into video
-    write_video(folder_video_images, count_img)
+    write_video(folder_video_images, count_img,  res_folder_path + "/" + script_infos["Song"] + "/soundtrack.wav")
     #Add music to the video
-    compile_sound_video("project.mp4", res_folder_path + "/" + script_infos["Song"] + "/soundtrack.wav")
+    #compile_sound_video("project.mp4", res_folder_path + "/" + script_infos["Song"] + "/soundtrack.wav")
 
 if __name__ == '__main__':
     main()
