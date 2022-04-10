@@ -2,7 +2,7 @@ import moviepy.editor as mpy
 import numpy as np
 import cv2
 from PIL import Image, ImageFont, ImageDraw
-
+from os.path import exists
 def combine_image(image_up, image_down, text_to_write, resolution_video = (1920,1080)) :
     #Create background
     final_image = Image.new('RGB', (resolution_video[1],resolution_video[0]))
@@ -11,7 +11,7 @@ def combine_image(image_up, image_down, text_to_write, resolution_video = (1920,
     final_image.paste(image_down, (int((resolution_video[1]-image_down.size[0])/2), int(resolution_video[0]/2)))
     #Add text
     final_image_edit = ImageDraw.Draw(final_image)
-    font_text = ImageFont.truetype("impact.ttf", 80)
+    font_text = ImageFont.truetype("impact.ttf", 100)
     w, h = final_image_edit.textsize(text_to_write, font=font_text)
     final_image_edit.text((int((resolution_video[1]-w)/2),int((resolution_video[0]-h)/2)) , text_to_write,font=font_text, stroke_width=5, stroke_fill=(0,0,0))
 
@@ -79,47 +79,57 @@ def create_video_frames_vid(part_of_video, count_img, image_list1, image_list2, 
         index_list2 = 0
         if j == 0 :
             for i in range(0, (int(part_of_video[1] - part_of_video[0]) * fps)):
-                img = combine_image(image_list1[index_list1], image_list2[index_list2], script_infos["Perso1"].split("/")[-1] + " VS " + script_infos["Perso2"].split("/")[-1], resolution_video)
+                img = combine_image(image_list1[0][index_list1], image_list2[0][index_list2], script_infos["Perso1"].split("/")[-1] + " VS " + script_infos["Perso2"].split("/")[-1], resolution_video)
                 img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
                 count_img+=1
 
                 index_list1 += 1
                 index_list2 += 1
-                if index_list2 >= len(image_list2) :
+                if index_list2 >= len(image_list2[0]) :
                     index_list2 = 0
-                if index_list1 >= len(image_list1) :
+                if index_list1 >= len(image_list1[0]) :
                     index_list1 = 0
 
         elif j % 2 == 1 :
             for i in range(0, int((part_of_video[j+1] - part_of_video[j]) * fps)):
-                img = combine_image(image_list1[index_list1], image_list2[index_list2],script_infos["Comparison"][k][0], resolution_video)
+                img = combine_image(image_list1[0][index_list1], image_list2[0][index_list2],script_infos["Comparison"][k][0], resolution_video)
                 img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
                 count_img+=1
 
                 index_list1 += 1
                 index_list2 += 1
-                if index_list2 >= len(image_list2) :
+                if index_list2 >= len(image_list2[0]) :
                     index_list2 = 0
-                if index_list1 >= len(image_list1) :
+                if index_list1 >= len(image_list1[0]) :
                     index_list1 = 0
         else :
             for i in range(0, int((part_of_video[j+1] - part_of_video[j]) * fps)):
 
                 if (int(script_infos["Comparison"][k][1]) == 1):
-                    img = full_screen_image(image_list1[index_list1])
+                    if len(image_list1)>1 :
+                        img = full_screen_image(image_list1[1][index_list1])
+                        index_list1 += 1
+                        if index_list1 >= len(image_list1[1]):
+                            index_list1 = 0
+                    else :
+                        img = full_screen_image(image_list1[0][index_list1])
+                        index_list1 += 1
+                        if index_list1 >= len(image_list1[0]):
+                            index_list1 = 0
                 else:
-                    img = full_screen_image(image_list2[index_list2])
 
+                    if len(image_list2)>1 :
+                        img = full_screen_image(image_list2[1][index_list2])
+                        index_list2 += 1
+                        if index_list2 >= len(image_list2[1]):
+                            index_list2 = 0
+                    else :
+                        img = full_screen_image(image_list2[0][index_list2])
+                        index_list2 += 1
+                        if index_list2 >= len(image_list2[0]):
+                            index_list2 = 0
                 img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
-
                 count_img+=1
-
-                index_list1 += 1
-                index_list2 += 1
-                if index_list2 >= len(image_list2) :
-                    index_list2 = 0
-                if index_list1 >= len(image_list1) :
-                    index_list1 = 0
             k+=1
         j+=1
     return count_img
@@ -148,9 +158,9 @@ def load_image_perso(path_perso) :
     img_perso  = Image.open(path_perso + "/pic1.jpg")
     return img_perso
 
-def load_video_perso(path_perso, lenmax=-1) :
+def load_video_perso(path_perso, vid_name, lenmax=-1) :
     img_list_perso = []
-    cap = cv2.VideoCapture(path_perso + "/vid1.mp4")
+    cap = cv2.VideoCapture(path_perso + vid_name)
     count = 0
     if lenmax == -1 :
         while True:
@@ -168,6 +178,17 @@ def load_video_perso(path_perso, lenmax=-1) :
             img_list_perso.append(pil_img)
             count+=1
     return img_list_perso
+
+def load_all_perso(path_perso, lenmax=-1) :
+    final_list_img = []
+    vid1_name ="/vid1.mp4"
+    vid2_name ="/vid2.mp4"
+    if exists(path_perso+vid1_name) :
+        final_list_img.append(load_video_perso(path_perso,vid1_name,lenmax))
+    if exists(path_perso+vid2_name) :
+        final_list_img.append(load_video_perso(path_perso, vid2_name,lenmax))
+
+    return final_list_img
 
 def load_timestamps(path_song) :
     with open(path_song + "/timestamps.txt") as f :
@@ -189,21 +210,27 @@ def main() :
     script_infos = read_script_file('Res/script.txt')
     #Import song and timestamps
     part_of_video = load_timestamps(res_folder_path + "/" + script_infos["Song"])
+
+
     #Import images
-    image_list1 = load_video_perso(res_folder_path + "/" + script_infos["Perso1"], 90)
-    image_list2 = load_video_perso(res_folder_path + "/" + script_infos["Perso2"], 90)
+    image_list1 = load_all_perso(res_folder_path + "/" + script_infos["Perso1"], 90)
+    image_list2 = load_all_perso(res_folder_path + "/" + script_infos["Perso2"], 90)
+
+
     #Resize them
     new_height = int(resolution_video[0] / 2)
-    for i in range(0, len(image_list1)) :
-        image_list1[i] = image_list1[i].resize((int(new_height * image_list1[i].size[0] / image_list1[i].size[1]) , new_height) )
-    for j in range(0, len(image_list2)) :
-        image_list2[j] = image_list2[j].resize((int(new_height * image_list2[j].size[0] / image_list2[j].size[1]), new_height))
+    for j in range(0,len(image_list1)) :
+        for i in range(0, len(image_list1[j])) :
+            image_list1[j][i] = image_list1[j][i].resize((int(new_height * image_list1[j][i].size[0] / image_list1[j][i].size[1]) , new_height) )
+    for j in range(0, len(image_list2)):
+        for i in range(0, len(image_list2[j])):
+            image_list2[j][i] = image_list2[j][i].resize((int(new_height * image_list2[j][i].size[0] / image_list2[j][i].size[1]), new_height))
     #Create video frames
     count_img = create_video_frames_vid(part_of_video,count_img,image_list1,image_list2,script_infos,resolution_video,folder_video_images,fps)
-    #Concatenate images into video
+    #Concatenate images into video (and add audio)
     write_video(folder_video_images, count_img,  res_folder_path + "/" + script_infos["Song"] + "/soundtrack.wav")
-    #Add music to the video
-    #compile_sound_video("project.mp4", res_folder_path + "/" + script_infos["Song"] + "/soundtrack.wav")
+
+
 
 if __name__ == '__main__':
     main()
