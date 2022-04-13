@@ -3,19 +3,25 @@ import numpy as np
 import cv2
 from PIL import Image, ImageFont, ImageDraw
 from os.path import exists
-def combine_image(image_up, image_down, text_to_write, resolution_video = (1920,1080)) :
+
+def combine_image(image_up, image_down, resolution_video = (1920,1080)) :
     #Create background
     final_image = Image.new('RGB', (resolution_video[1],resolution_video[0]))
     #Add images
     final_image.paste(image_up, (int((resolution_video[1]-image_up.size[0])/2),0))
     final_image.paste(image_down, (int((resolution_video[1]-image_down.size[0])/2), int(resolution_video[0]/2)))
-    #Add text
-    final_image_edit = ImageDraw.Draw(final_image)
-    font_text = ImageFont.truetype("impact.ttf", 100)
-    w, h = final_image_edit.textsize(text_to_write, font=font_text)
-    final_image_edit.text((int((resolution_video[1]-w)/2),int((resolution_video[0]-h)/2)) , text_to_write,font=font_text, stroke_width=5, stroke_fill=(0,0,0))
 
     return final_image
+
+
+def add_text_to_image(image, text_to_write, t, resolution_video = (1920,1080), start_size = 500 , end_size = 200, speed =50):
+    final_image_edit = ImageDraw.Draw(image)
+    size = start_size - 40*(int(t))
+    size = max(end_size, size)
+    font_text = ImageFont.truetype("impact.ttf", size)
+    w, h = final_image_edit.textsize(text_to_write, font=font_text)
+    final_image_edit.text((int((resolution_video[1] - w) / 2), int((resolution_video[0] - h) / 2)), text_to_write,font=font_text, stroke_width=5, stroke_fill=(0, 0, 0))
+    return image
 
 def full_screen_image(image, resolution_video=(1920,1080)) :
     final_image = Image.new('RGB', (resolution_video[1], resolution_video[0]))
@@ -78,8 +84,11 @@ def create_video_frames_vid(part_of_video, count_img, image_list1, image_list2, 
         index_list1 = 0
         index_list2 = 0
         if j == 0 :
+            text_to_write = script_infos["Perso1"].split("/")[-1] + " VS " + script_infos["Perso2"].split("/")[-1]
+            t_start = count_img
             for i in range(0, (int(part_of_video[1] - part_of_video[0]) * fps)):
-                img = combine_image(image_list1[0][index_list1], image_list2[0][index_list2], script_infos["Perso1"].split("/")[-1] + " VS " + script_infos["Perso2"].split("/")[-1], resolution_video)
+                img = combine_image(image_list1[0][index_list1], image_list2[0][index_list2], resolution_video)
+                img = add_text_to_image(img,text_to_write,count_img-t_start,resolution_video, start_size=500, end_size=100, speed=50)
                 img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
                 count_img+=1
 
@@ -91,8 +100,12 @@ def create_video_frames_vid(part_of_video, count_img, image_list1, image_list2, 
                     index_list1 = 0
 
         elif j % 2 == 1 :
+            text_to_write = script_infos["Comparison"][k][0]
+            t_start = count_img
             for i in range(0, int((part_of_video[j+1] - part_of_video[j]) * fps)):
-                img = combine_image(image_list1[0][index_list1], image_list2[0][index_list2],script_infos["Comparison"][k][0], resolution_video)
+                img = combine_image(image_list1[0][index_list1], image_list2[0][index_list2], resolution_video)
+                img = add_text_to_image(img, text_to_write, count_img - t_start, resolution_video, end_size=100)
+
                 img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
                 count_img+=1
 
@@ -133,6 +146,7 @@ def create_video_frames_vid(part_of_video, count_img, image_list1, image_list2, 
             k+=1
         j+=1
     return count_img
+
 
 def write_video(pathFolderImages, numberOfFrames, audio_path, fps=30.0) :
     image_files = []
