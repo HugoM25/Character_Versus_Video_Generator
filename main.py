@@ -116,8 +116,8 @@ def main() :
 
 
     #Import images
-    image_list1 = load_all_perso(res_folder_path + "/" + script_infos.perso1, 90)
-    image_list2 = load_all_perso(res_folder_path + "/" + script_infos.perso2, 90)
+    image_list1 = load_all_of_perso(res_folder_path + "/" + script_infos.perso1, ["vid1.mp4","vid2.mp4"] , 90)
+    image_list2 = load_all_of_perso(res_folder_path + "/" + script_infos.perso2, ["vid1.mp4","vid2.mp4"] , 90)
 
 
     #Resize them
@@ -131,7 +131,19 @@ def main() :
     #Concatenate images into video (and add audio)
     write_video(folder_video_images, count_img,  res_folder_path + "/" + script_infos.song + "/soundtrack.wav")
 
+def main2() :
+    fps = 30
+    folder_video_images = "Temp"
+    res_folder_path = "Res"
+    count_img = 0
+    resolution_video = (1920, 1080)
+    script_infos = ScriptReader('Res/script.txt')
 
+    #Import images
+    image_list1 = load_all_of_perso(res_folder_path+"/"+script_infos.perso1, ["body.png"])
+    #Resize body image
+    new_height = int(resolution_video[0] * (2/3))
+    image_list1[0] = resize_images(image_list1[0], new_height=new_height)
 
 if __name__ == '__main__':
-    main()
+    main2()

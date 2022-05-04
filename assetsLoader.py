@@ -2,8 +2,8 @@ import cv2
 from PIL import Image
 from os.path import exists
 
-def load_image_perso(path_perso) :
-    img_perso  = Image.open(path_perso + "/pic1.jpg")
+def load_image_perso(path_perso, filename) :
+    img_perso  = Image.open(path_perso + filename)
     return img_perso
 
 def load_video_perso(path_perso, vid_name, lenmax=-1) :
@@ -27,14 +27,18 @@ def load_video_perso(path_perso, vid_name, lenmax=-1) :
             count+=1
     return img_list_perso
 
-def load_all_perso(path_perso, lenmax=-1) :
+def load_all_of_perso(path_perso, files_to_load, lenmax=-1) :
     final_list_img = []
-    vid1_name ="/vid1.mp4"
-    vid2_name ="/vid2.mp4"
-    if exists(path_perso+vid1_name) :
-        final_list_img.append(load_video_perso(path_perso,vid1_name,lenmax))
-    if exists(path_perso+vid2_name) :
-        final_list_img.append(load_video_perso(path_perso, vid2_name,lenmax))
+    imageExtension = [".png", ".jpg", ".jpeg"]
+    videoExtension = [".mp4"]
+
+    for file_to_load in files_to_load :
+        if exists(path_perso+"/"+file_to_load) :
+            extension_of_file = file_to_load.split(".")[1]
+            if extension_of_file in videoExtension :
+                final_list_img.append(load_video_perso(path_perso,file_to_load,lenmax))
+            elif extension_of_file in videoExtension :
+                final_list_img.append(load_image_perso(path_perso,))
 
     return final_list_img
 
