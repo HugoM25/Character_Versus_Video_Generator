@@ -51,13 +51,19 @@ def body_comp_images(img_body1, img_body2, t, background, resolution_video=(1920
     #final_image = Image.new('RGB', (resolution_video[1], resolution_video[0]))
     final_image = background.copy()
     #Calculate pos based on time of the frame
-    #Formula : f(t) = W-(abs(t-0.5)*W*2)  ,  0 < t < 1 , W half the width
-    w = resolution_video[0]/3
-    equation_pos = w/2-(abs((t-0.5)*w))
+    #Formula : f(t) = c-(abs(t-0.5)*c*2)  ,  0 < t < 1 , c the middle (where they collide)
+    c = resolution_video[0] / 3
+    #New formula :
+    if t < 0.25 :
+        equation_pos = c/2 - (abs(1.8*t-0.5)* c * 1.3)
+    elif t >= 0.25 and t <= 0.75 :
+        equation_pos = (-c*2) * pow((t-0.5),2) + c/2
+    else :
+        equation_pos = c/2 - (abs(1.8* t -1.3)* c * 1.3)
+
     pos1 = (int(0 + equation_pos - img_body1.size[0]/2), int(resolution_video[1]/2))
     pos2 = (int(resolution_video[0]/2 - equation_pos - img_body2.size[0]/2), int(resolution_video[1]/2))
     # Paste images
     final_image.paste(img_body1, pos1, img_body1)
     final_image.paste(img_body2, pos2, img_body2)
-
     return final_image
