@@ -23,9 +23,10 @@ class ScriptReader() :
             self.perso1 = lines[1].split(" ")[0]
             self.perso2 = lines[1].split(" ")[2].split(",")
             self.song = lines[2]
-
+            self.background = lines[3]
             self.comparisons = []
-            for i in range(3, len(lines)) :
+            for i in range(4, len(lines)) :
                 self.comparisons.append(lines[i].split(" "))
+
         else :
             print("[ERROR] NO TYPE OF EDIT CHOSEN")

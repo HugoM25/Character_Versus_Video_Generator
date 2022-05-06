@@ -45,3 +45,19 @@ def resize_images(image_list, new_height=-1, new_width=-1) :
                 height_tmp = int(new_width / ratio)
                 image_list[i] = image_list[i].resize((new_width, height_tmp))
     return image_list
+
+
+def body_comp_images(img_body1, img_body2, t, background, resolution_video=(1920,1080)) :
+    #final_image = Image.new('RGB', (resolution_video[1], resolution_video[0]))
+    final_image = background.copy()
+    #Calculate pos based on time of the frame
+    #Formula : f(t) = W-(abs(t-0.5)*W*2)  ,  0 < t < 1 , W half the width
+    w = resolution_video[0]/3
+    equation_pos = w/2-(abs((t-0.5)*w))
+    pos1 = (int(0 + equation_pos - img_body1.size[0]/2), int(resolution_video[1]/2))
+    pos2 = (int(resolution_video[0]/2 - equation_pos - img_body2.size[0]/2), int(resolution_video[1]/2))
+    # Paste images
+    final_image.paste(img_body1, pos1, img_body1)
+    final_image.paste(img_body2, pos2, img_body2)
+
+    return final_image
