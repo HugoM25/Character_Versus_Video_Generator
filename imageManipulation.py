@@ -60,10 +60,14 @@ def body_comp_images(img_body1, img_body2, t, background, resolution_video=(1920
         equation_pos = (-c*2) * pow((t-0.5),2) + c/2
     else :
         equation_pos = c/2 - (abs(1.8* t -1.3)* c * 1.3)
-
+    angle = equation_pos / c * 15
     pos1 = (int(0 + equation_pos - img_body1.size[0]/2), int(resolution_video[1]/2))
     pos2 = (int(resolution_video[0]/2 - equation_pos - img_body2.size[0]/2), int(resolution_video[1]/2))
+
+    #Apply rotation
+    img_body1_rot = img_body1.rotate(-angle, Image.NEAREST, expand=1)
+    img_body2_rot = img_body2.rotate(angle, Image.NEAREST, expand=1)
     # Paste images
-    final_image.paste(img_body1, pos1, img_body1)
-    final_image.paste(img_body2, pos2, img_body2)
+    final_image.paste(img_body1_rot, pos1, img_body1_rot)
+    final_image.paste(img_body2_rot, pos2, img_body2_rot)
     return final_image

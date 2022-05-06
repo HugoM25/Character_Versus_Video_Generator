@@ -20,8 +20,11 @@ class ScriptReader() :
                 self.comparisons.append(lines[i].split(" "))
 
         elif self.typeOfEdit == 2 :
-            self.perso1 = lines[1].split(" ")[0]
-            self.perso2 = lines[1].split(" ")[2].split(",")
+            self.perso_gr1 = lines[1].split(" ")[0].split(",")
+            self.perso_gr1 = [x.replace("\\", "/") for x in self.perso_gr1]
+            self.perso_gr2 = lines[1].split(" ")[2].split(",")
+            self.perso_gr2 = [x.replace("\\", "/") for x in self.perso_gr2]
+
             self.song = lines[2]
             self.background = lines[3]
             self.comparisons = []

@@ -87,13 +87,10 @@ def create_video_frames_type2(part_of_video, count_img, image_list1, image_list2
         index_list1 = 0
         index_list2 = 0
         if j == 0:
-
-            img = body_comp_images(image_list1[0][0], image_list2[0][0], 0,background, resolution_video)
-            img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
-            text_to_write = script_infos.perso1.split("/")[-1] + " VS " + script_infos.perso1.split("/")[-1]
+            text_to_write = script_infos.perso_gr1[0].split("/")[-1] + " VS " + script_infos.perso_gr2[0].split("/")[-1]
             t_start = count_img
             for i in range(0, (int(part_of_video[1] - part_of_video[0]) * fps)):
-                img = combine_image(image_list1[1][index_list1], image_list2[1][index_list2], resolution_video)
+                img = combine_image(image_list1[0][1][index_list1], image_list2[0][1][index_list2], resolution_video)
                 img = add_text_to_image(img, text_to_write, count_img - t_start, resolution_video, start_size=100,
                                         change_size=False)
                 img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
@@ -101,20 +98,18 @@ def create_video_frames_type2(part_of_video, count_img, image_list1, image_list2
 
                 index_list1 += 1
                 index_list2 += 1
-                if index_list2 >= len(image_list2[0]):
+                if index_list2 >= len(image_list2[0][1]):
                     index_list2 = 0
-                if index_list1 >= len(image_list1[0]):
+                if index_list1 >= len(image_list1[0][1]):
                     index_list1 = 0
 
         #Comparison part
         elif j % 2 == 1:
-            text_to_write = script_infos.comparisons[k][0]
-            t_start = count_img
             nb_frames = int((part_of_video[j + 1] - part_of_video[j]) * fps)
             print(nb_frames)
             for i in range(0, nb_frames):
                 t = i/nb_frames
-                img = body_comp_images(image_list1[0][0], image_list2[0][0],t,background,resolution_video)
+                img = body_comp_images(image_list1[0][0][0], image_list2[0][0][0],t,background,resolution_video)
                 img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
                 count_img += 1
         #Show winnerPart
@@ -123,33 +118,32 @@ def create_video_frames_type2(part_of_video, count_img, image_list1, image_list2
 
                 if (int(script_infos.comparisons[k][1]) == 1):
                     if len(image_list1) > 1:
-                        img = full_screen_image(image_list1[1][index_list1])
+                        img = full_screen_image(image_list1[0][1][index_list1])
                         index_list1 += 1
-                        if index_list1 >= len(image_list1[1]):
+                        if index_list1 >= len(image_list1[0][1]):
                             index_list1 = 0
                     else:
-                        img = full_screen_image(image_list1[0][index_list1])
+                        img = full_screen_image(image_list1[0][1][index_list1])
                         index_list1 += 1
-                        if index_list1 >= len(image_list1[0]):
+                        if index_list1 >= len(image_list1[0][1]):
                             index_list1 = 0
                 else:
 
                     if len(image_list2) > 1:
-                        img = full_screen_image(image_list2[1][index_list2])
+                        img = full_screen_image(image_list2[0][1][index_list2])
                         index_list2 += 1
-                        if index_list2 >= len(image_list2[1]):
+                        if index_list2 >= len(image_list2[0][1]):
                             index_list2 = 0
                     else:
-                        img = full_screen_image(image_list2[0][index_list2])
+                        img = full_screen_image(image_list2[0][1][index_list2])
                         index_list2 += 1
-                        if index_list2 >= len(image_list2[0]):
+                        if index_list2 >= len(image_list2[0][0]):
                             index_list2 = 0
                 img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
                 count_img += 1
             k += 1
         j += 1
     return count_img
-
 
 def write_video(pathFolderImages, numberOfFrames, audio_path, fps=30.0) :
     image_files = []
@@ -207,22 +201,41 @@ def main2() :
     folder_video_images = "Temp"
     res_folder_path = "Res"
     count_img = 0
+    #Make sure resolution is in good order (rn it is not)
     resolution_video = (1920, 1080)
     script_infos = ScriptReader('Res/script2.txt')
 
-    #Import images
-    image_list1 = load_all_of_perso(res_folder_path+"/"+script_infos.perso1, ["body.png", "vid1.mp4"])
-    image_list2 = load_all_of_perso(res_folder_path+"/"+script_infos.perso2[0], ["body.png","vid1.mp4"])
+    #Import characters and their images
+    image_gr1_list = []
+    image_gr2_list = []
+    new_height = int(resolution_video[0] / 2)
+
+    for perso in script_infos.perso_gr1 :
+        images_perso = load_all_of_perso(res_folder_path + "/" + perso, ["body.png","vid1.mp4"] , 90)
+        # Resize them
+        for j in range(0, len(images_perso)):
+            images_perso[j] = resize_images(images_perso[j], new_height=new_height)
+        for j in range(0, len(images_perso)):
+            images_perso[j] = resize_images(images_perso[j], new_height=new_height)
+        image_gr1_list.append(images_perso)
+
+    for perso in script_infos.perso_gr2 :
+        images_perso = load_all_of_perso(res_folder_path + "/" + perso, ["body.png","vid1.mp4"] , 90)
+        # Resize them
+        for j in range(0, len(images_perso)):
+            images_perso[j] = resize_images(images_perso[j], new_height=new_height)
+        for j in range(0, len(images_perso)):
+            images_perso[j] = resize_images(images_perso[j], new_height=new_height)
+        image_gr2_list.append(images_perso)
+
     background = load_background(res_folder_path+"/Backgrounds", script_infos.background)
     #Import song and timeStamps
     part_of_video = load_timestamps(res_folder_path + "/" + script_infos.song)
-    #Resize body image
-    new_height = int(resolution_video[0] * (1/2))
-    image_list1[0] = resize_images(image_list1[0], new_height=new_height)
-    image_list2[0] = resize_images(image_list2[0], new_height=new_height)
-    background = background.resize((1080,1920))
 
-    count_img  = create_video_frames_type2(part_of_video,count_img,image_list1,image_list2, background, script_infos,resolution_video, folder_video_images, fps)
+    print(image_gr1_list[0])
+    #Resize background
+    background = background.resize((1080,1920))
+    count_img  = create_video_frames_type2(part_of_video,count_img,image_gr1_list,image_gr2_list, background, script_infos,resolution_video, folder_video_images, fps)
     write_video(folder_video_images, count_img, res_folder_path + "/" + script_infos.song + '/soundtrack.wav')
 
 if __name__ == '__main__':
