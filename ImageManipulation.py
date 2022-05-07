@@ -31,6 +31,14 @@ def full_screen_image(image, resolution_video=(1920,1080)) :
     final_image.paste(image, (int((resolution_video[1]-image.size[0])/2),0))
     return final_image
 
+def create_background(background, resolution_video = (1920,1080)) :
+    final_image = Image.new('RGB', (resolution_video[1], resolution_video[0]))
+    new_height = resolution_video[0]
+    ratio = background.size[0] / background.size[1]
+    background = background.resize((int(ratio*new_height),new_height))
+    final_image.paste(background, (int(-background.size[0]/2 + resolution_video[1]/2),0))
+    return final_image
+
 def resize_images(image_list, new_height=-1, new_width=-1) :
     new_height = int(new_height)
     new_width = int(new_width)

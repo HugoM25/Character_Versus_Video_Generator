@@ -207,7 +207,6 @@ def main2() :
     image_gr1_list = []
     image_gr2_list = []
     new_height = int(resolution_video[0] / 2)
-
     for perso in script_infos.perso_gr1 :
         images_perso = load_all_of_perso(res_folder_path + "/" + perso, ["body.png","vid2.mp4"] , 90)
         # Resize them
@@ -231,7 +230,7 @@ def main2() :
     part_of_video = load_timestamps(res_folder_path + "/" + script_infos.song)
 
     #Resize background
-    background = background.resize((1080,1920))
+    background = create_background(background, resolution_video)
     count_img  = create_video_frames_type2(part_of_video,count_img,image_gr1_list,image_gr2_list, background, script_infos,resolution_video, folder_video_images, fps)
     write_video(folder_video_images, count_img, res_folder_path + "/" + script_infos.song + '/soundtrack.wav')
 
