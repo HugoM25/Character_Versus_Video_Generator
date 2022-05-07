@@ -11,7 +11,7 @@ def main():
 
 def main2() :
     import cv2
-    vidcap = cv2.VideoCapture("D:\Youtube\AnimeFights\zoroVSwarlords.mp4")
+    vidcap = cv2.VideoCapture("D:\Youtube\AnimeFights\Who is strongest (1).mp4")
     success, image = vidcap.read()
     count = 0
 
@@ -20,4 +20,4 @@ def main2() :
         success, image = vidcap.read()
         count += 1
 if __name__ == "__main__" :
-    main()
+    main2()

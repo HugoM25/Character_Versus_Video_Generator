@@ -8,7 +8,7 @@ def combine_image(image_up, image_down, resolution_video = (1920,1080)) :
     final_image.paste(image_down, (int((resolution_video[1]-image_down.size[0])/2), int(resolution_video[0]/2)))
     return final_image
 
-def add_text_to_image(image, text_to_write, t, resolution_video = (1920,1080), change_size = False, start_size = 500 , end_size = 200, speed =50):
+def add_text_to_image(image, text_to_write, t, resolution_video = (1920,1080), change_size = False, start_size = 500 , end_size = 200, speed =50, align="left"):
     final_image_edit = ImageDraw.Draw(image)
 
     if change_size == True :
@@ -16,9 +16,10 @@ def add_text_to_image(image, text_to_write, t, resolution_video = (1920,1080), c
         size = max(end_size, size)
     else :
         size = start_size
+
     font_text = ImageFont.truetype("impact.ttf", size)
     w, h = final_image_edit.textsize(text_to_write, font=font_text)
-    final_image_edit.text((int((resolution_video[1] - w) / 2), int((resolution_video[0] - h) / 2)), text_to_write,font=font_text, stroke_width=5, stroke_fill=(0, 0, 0))
+    final_image_edit.text((int((resolution_video[1] - w) / 2), int((resolution_video[0] - h) / 2)), text_to_write,font=font_text, stroke_width=5, stroke_fill=(0, 0, 0), align=align)
 
     return image
 
@@ -47,7 +48,7 @@ def resize_images(image_list, new_height=-1, new_width=-1) :
     return image_list
 
 
-def body_comp_images(img_body1, img_body2, t, background, resolution_video=(1920,1080)) :
+def body_comp_images(img_body1, img_body2, t, background, resolution_video=(1920,1080), angle_max=10) :
     #final_image = Image.new('RGB', (resolution_video[1], resolution_video[0]))
     final_image = background.copy()
     #Calculate pos based on time of the frame
@@ -55,12 +56,16 @@ def body_comp_images(img_body1, img_body2, t, background, resolution_video=(1920
     c = resolution_video[0] / 3
     #New formula :
     if t < 0.25 :
-        equation_pos = c/2 - (abs(1.8*t-0.5)* c * 1.3)
+        equation_pos = c/2 - (abs(1.8*t-0.5)* c * 1.1)
+        equation_pos = min(equation_pos, (-c*2) * pow((t-0.5),2) + c/2)
     elif t >= 0.25 and t <= 0.75 :
         equation_pos = (-c*2) * pow((t-0.5),2) + c/2
     else :
-        equation_pos = c/2 - (abs(1.8* t -1.3)* c * 1.3)
-    angle = equation_pos / c * 15
+        equation_pos = c/2 - (abs(1.8* t -1.1)* c * 1.1)
+        equation_pos = max(equation_pos, (-c*2) * pow((t-0.5),2) + c/2)
+
+
+    angle = equation_pos / c * angle_max
     pos1 = (int(0 + equation_pos - img_body1.size[0]/2), int(resolution_video[1]/2))
     pos2 = (int(resolution_video[0]/2 - equation_pos - img_body2.size[0]/2), int(resolution_video[1]/2))
 
