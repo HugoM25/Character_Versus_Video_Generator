@@ -5,8 +5,8 @@ from PIL import Image, ImageFont, ImageDraw
 from os.path import exists
 
 from ScriptReader import *
-from imageManipulation import *
-from assetsLoader import *
+from ImageManipulation import *
+from AssetsLoader import *
 
 
 def create_video_frames_vid(part_of_video, count_img, image_list1, image_list2, script_infos, resolution_video =(1920,1080), folder_video_images = "Temp", fps=30) :
@@ -115,7 +115,6 @@ def create_video_frames_type2(part_of_video, count_img, image_list1, image_list2
         #Show winnerPart
         else:
             for i in range(0, int((part_of_video[j + 1] - part_of_video[j]) * fps)):
-
                 if (int(script_infos.comparisons[k][2]) == 1):
                     if len(image_list1) > 1:
                         img = full_screen_image(image_list1[index_perso1][1][index_list1])
@@ -143,6 +142,7 @@ def create_video_frames_type2(part_of_video, count_img, image_list1, image_list2
                 count_img += 1
             k += 1
         j += 1
+
     return count_img
 
 def write_video(pathFolderImages, numberOfFrames, audio_path, fps=30.0) :
@@ -167,8 +167,6 @@ def compile_sound_video(path_file_video, path_file_audio):
 
 
 def main() :
-
-
     fps = 30
     folder_video_images = "Temp"
     res_folder_path = "Res"
@@ -211,7 +209,7 @@ def main2() :
     new_height = int(resolution_video[0] / 2)
 
     for perso in script_infos.perso_gr1 :
-        images_perso = load_all_of_perso(res_folder_path + "/" + perso, ["body.png","vid1.mp4"] , 90)
+        images_perso = load_all_of_perso(res_folder_path + "/" + perso, ["body.png","vid2.mp4"] , 90)
         # Resize them
         for j in range(0, len(images_perso)):
             images_perso[j] = resize_images(images_perso[j], new_height=new_height)
