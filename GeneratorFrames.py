@@ -1,6 +1,5 @@
 import moviepy.editor as mpy
 
-
 from ImageManipulation import *
 
 

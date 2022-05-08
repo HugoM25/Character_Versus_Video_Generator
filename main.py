@@ -1,18 +1,11 @@
-import moviepy.editor as mpy
-import numpy as np
-import cv2
-from PIL import Image, ImageFont, ImageDraw
-from os.path import exists
+import argparse
 #My libraries ---------------------------
 from ScriptReader import *
-from ImageManipulation import *
 from AssetsLoader import *
 from GeneratorFrames import *
 
 def generate_edit_type1(script_infos, fps=30,folder_video_images="Temp", res_folder_path="Res", resolution_video=(1920,1080)) :
     count_img = 0
-    #Read Script
-    script_infos = ScriptReader('Res/script.txt')
     #Import song and timestamps
     part_of_video = load_timestamps(res_folder_path + "/" + script_infos.song)
 
@@ -66,13 +59,29 @@ def generate_edit_type2(script_infos,fps=30, folder_video_images="Temp", res_fol
     write_video(folder_video_images, count_img, res_folder_path + "/" + script_infos.song + '/soundtrack.wav')
 
 def main() :
-    fps = 30
-    folder_video_images = "Temp"
-    res_folder_path = "Res"
     # Make sure resolution is in good order (rigth now it is not)
     resolution_video = (1920, 1080)
 
-    script_infos = ScriptReader('Res/script2.txt')
+    # Parse the arguments-------------------------------------
+    parser = argparse.ArgumentParser(description='Informations')
+    parser.add_argument('--fps', type=int, help="FPS of the video", default=30)
+    parser.add_argument('--supptemp', type=bool, help="Option to delete the temp data stored to create the final video",
+                        default=True)
+    parser.add_argument('--tempFolder', type=str, help="Path to the folder used to store temporary files",
+                        default="Temp")
+    parser.add_argument("--resFolder", type=str, help="Path to the folder with the video and images resources",
+                        default="Res")
+    parser.add_argument("--scriptPath", type=str, help="Path to the script to read",
+                        default="Res/script.txt" )
+    args = parser.parse_args()
+    res_folder_path = args.resFolder
+    folder_video_images = args.tempFolder
+    fps = args.fps
+    script_path = args.scriptPath
+    suppTemp = args.supptemp
+
+
+    script_infos = ScriptReader(script_path)
 
     if script_infos.typeOfEdit == 1 :
         generate_edit_type1(script_infos,fps, folder_video_images, res_folder_path,resolution_video)
