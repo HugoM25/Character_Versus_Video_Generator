@@ -75,9 +75,10 @@ def create_video_frames_vid(part_of_video, count_img, image_list1, image_list2, 
 def create_video_frames_type2(part_of_video, count_img, image_list1, image_list2, background, script_infos, resolution_video =(1920,1080), folder_video_images = "Temp", fps=30) :
     j = 0
     k = 0
-    index_list1 = 0
-    index_list2 = 0
+
     defiler = FrameDefiler("backward", len(image_list1[0][1]), len(image_list2[0][1]))
+    index_list1, index_list2 = defiler.reset()
+
     while j < len(part_of_video) - 1 and k < len(script_infos.comparisons):
 
         if j == 0:
