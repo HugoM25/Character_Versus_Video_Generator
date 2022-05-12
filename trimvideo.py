@@ -2,12 +2,12 @@ from moviepy.editor import *
 import os
 def main():
     current_path = os.getcwd()
-    path_perso = "\Res\Persos\One_Piece\Zoro"
-    start_time = 552
-    end_time = 555.5
+    path_perso = "/Res/Persos"
+    start_time = 38.5+2*60
+    end_time = 42+2*60
     clip = VideoFileClip(current_path + path_perso + "\\brut.mp4")
     clip = clip.subclip(start_time,end_time)
-    clip.write_videofile(current_path + path_perso + "\\vid2.mp4", codec="libx264", remove_temp= True, fps=30)
+    clip.write_videofile(current_path + path_perso + "\\vid1.mp4", codec="libx264", remove_temp= True, fps=30)
 
 def main2() :
     import cv2
