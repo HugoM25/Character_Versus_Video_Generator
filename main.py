@@ -4,59 +4,33 @@ from ScriptReader import *
 from AssetsLoader import *
 from GeneratorFrames import *
 
-def generate_edit_type1(script_infos, fps=30,folder_video_images="Temp", res_folder_path="Res", resolution_video=(1920,1080)) :
+def generate_edit(script_infos,  fps=30,folder_video_images="Temp", res_folder_path="Res", resolution_video=(1920,1080)) :
     count_img = 0
-    #Import song and timestamps
-    part_of_video = load_timestamps(res_folder_path + "/" + script_infos.song)
-
-    #Import images
-    image_list1 = load_all_of_perso(res_folder_path + "/" + script_infos.perso1, ["vid1.mp4","vid2.mp4"] , 90)
-    image_list2 = load_all_of_perso(res_folder_path + "/" + script_infos.perso2, ["vid1.mp4","vid2.mp4"] , 90)
-
-    #Resize them
+    # Import characters and their images
+    characters_img = []
     new_height = int(resolution_video[0] / 2)
-    for j in range(0,len(image_list1)) :
-        image_list1[j] = resize_images(image_list1[j], new_height=new_height)
-    for j in range(0,len(image_list2)) :
-        image_list2[j] = resize_images(image_list2[j], new_height=new_height)
-    #Create video frames
-    count_img = create_video_frames_vid(part_of_video,count_img,image_list1,image_list2,script_infos,resolution_video,folder_video_images,fps)
-    #Concatenate images into video (and add audio)
-    write_video(folder_video_images, count_img,  res_folder_path + "/" + script_infos.song + "/soundtrack.wav")
-
-def generate_edit_type2(script_infos,fps=30, folder_video_images="Temp", res_folder_path="Res", resolution_video=(1920,1080)) :
-    count_img = 0
-
-    #Import characters and their images
-    image_gr1_list = []
-    image_gr2_list = []
-    new_height = int(resolution_video[0] / 2)
-    for perso in script_infos.perso_gr1 :
-        images_perso = load_all_of_perso(res_folder_path + "/" + perso, ["body.png","vid2.mp4"] , 90)
+    for perso in script_infos.persos:
+        images_perso = load_all_of_perso(res_folder_path + "/" + perso[0], perso[1], 90)
         # Resize them
         for j in range(0, len(images_perso)):
             images_perso[j] = resize_images(images_perso[j], new_height=new_height)
-        for j in range(0, len(images_perso)):
-            images_perso[j] = resize_images(images_perso[j], new_height=new_height)
-        image_gr1_list.append(images_perso)
+        characters_img.append(images_perso)
+    #Import Background
 
-    for perso in script_infos.perso_gr2 :
-        images_perso = load_all_of_perso(res_folder_path + "/" + perso, ["body.png","vid1.mp4"] , 90)
-        # Resize them
-        for j in range(0, len(images_perso)):
-            images_perso[j] = resize_images(images_perso[j], new_height=new_height)
-        for j in range(0, len(images_perso)):
-            images_perso[j] = resize_images(images_perso[j], new_height=new_height)
-        image_gr2_list.append(images_perso)
-
-    background = load_background(res_folder_path+"/Backgrounds", script_infos.background)
-    #Import song and timeStamps
-    part_of_video = load_timestamps(res_folder_path + "/" + script_infos.song)
-
-    #Resize background
+    background = load_background(res_folder_path +"/" + script_infos.background)
     background = create_background(background, resolution_video)
-    count_img = create_video_frames_type2(part_of_video,count_img,image_gr1_list,image_gr2_list, background, script_infos,resolution_video, folder_video_images, fps)
+    # Import song and timeStamps
+    part_of_video = load_timestamps(res_folder_path + "/" + script_infos.song)
+    #Write frames according to the style of the edit
+    if script_infos.type_of_edit == 1 :
+        count_img = create_video_frames_edit1(part_of_video, count_img, characters_img, background,
+                                    script_infos, resolution_video, folder_video_images, fps)
+    elif script_infos.type_of_edit == 2 :
+        count_img = create_video_frames_edit2(part_of_video, count_img, characters_img, background,
+                                              script_infos, resolution_video, folder_video_images, fps)
+    #Finally write the video
     write_video(folder_video_images, count_img, res_folder_path + "/" + script_infos.song + '/soundtrack.wav')
+
 
 def main() :
     # Make sure resolution is in good order (rigth now it is not)
@@ -82,11 +56,9 @@ def main() :
 
 
     script_infos = ScriptReader(script_path)
+    print("Script ok")
+    print(script_infos.persos)
 
-    if script_infos.typeOfEdit == 1 :
-        generate_edit_type1(script_infos,fps, folder_video_images, res_folder_path,resolution_video)
-    elif script_infos.typeOfEdit == 2 :
-        generate_edit_type2(script_infos, fps, folder_video_images, res_folder_path, resolution_video)
-
+    generate_edit(script_infos, fps, folder_video_images, res_folder_path, resolution_video)
 if __name__ == '__main__':
     main()

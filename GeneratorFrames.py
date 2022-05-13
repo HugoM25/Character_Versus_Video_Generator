@@ -2,136 +2,108 @@ import moviepy.editor as mpy
 
 from ImageManipulation import *
 
-
-
-def create_video_frames_vid(part_of_video, count_img, image_list1, image_list2, script_infos, resolution_video =(1920,1080), folder_video_images = "Temp", fps=30) :
+def create_video_frames_edit1(part_of_video, count_img, characters_img, background, script_infos, resolution_video = (1920,1080)
+                        , folder_video_images = "Temp", fps = 30):
     j = 0
     k = 0
-    index_list1 = 0
-    index_list2 = 0
-    defiler = FrameDefiler("backward", len(image_list1[0]), len(image_list2[0]))
-    while j < len(part_of_video)-1 and k < len(script_infos.comparisons) :
-        if j == 0 :
-            # Set up the defiler object
-            defiler.change_max(len(image_list1[0]), len(image_list2[0]))
+    defiler = FrameDefiler("backward", 0, 0)
+    index_list1, index_list2 = defiler.reset()
+    while j < len(part_of_video) - 1 and k < len(script_infos.comparisons):
+        if j == 0:
+            perso_up = characters_img[0]
+            perso_down = characters_img[1]
+            defiler.change_max(len(perso_up[1]), len(perso_down[1]))
             index_list1, index_list2 = defiler.reset()
-
-            text_to_write = script_infos.perso1.split("/")[-1] + " VS " + script_infos.perso1.split("/")[-1]
+            text_to_write = script_infos.title[0] + "\n" + script_infos.title[1] + "\n" + script_infos.title[2]
             t_start = count_img
-            for i in range(0, (int(part_of_video[1] - part_of_video[0]) * fps)):
-                img = combine_image(image_list1[0][index_list1], image_list2[0][index_list2], resolution_video)
-                img = add_text_to_image(img,text_to_write,count_img-t_start,resolution_video, start_size=100, change_size= False)
+            nb_frames = (int(part_of_video[1] - part_of_video[0]) * fps)
+            for i in range(0, nb_frames):
+                img = combine_image(perso_up[1][index_list1], perso_down[1][index_list2], resolution_video)
+                img = add_text_to_image(img, text_to_write, count_img - t_start, resolution_video, start_size=100, change_size=False, align="center")
                 img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
-                count_img+=1
-
+                count_img += 1
                 index_list1, index_list2 = defiler.defile(index_list1, index_list2, 1, 1)
-        elif j % 2 == 1 :
+        # Comparison part
+        elif j % 2 == 1:
             # Set up the defiler object
-            defiler.change_max(len(image_list1[0]), len(image_list2[0]))
+            perso_up = characters_img[0]
+            perso_down = characters_img[1]
+
+            defiler.change_max(len(perso_up[1]), len(perso_down[1]))
             index_list1, index_list2 = defiler.reset()
 
             text_to_write = script_infos.comparisons[k][0]
             t_start = count_img
             for i in range(0, int((part_of_video[j+1] - part_of_video[j]) * fps)):
-                img = combine_image(image_list1[0][index_list1], image_list2[0][index_list2], resolution_video)
+                img = combine_image(perso_up[1][index_list1], perso_down[1][index_list2], resolution_video)
                 img = add_text_to_image(img, text_to_write, count_img - t_start, resolution_video, change_size=False, start_size=100)
 
                 img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
                 count_img+=1
                 index_list1, index_list2 = defiler.defile(index_list1, index_list2, 1, 1)
-        else :
-            # Set up the defiler object
-            defiler.change_max(len(image_list1[0]), len(image_list2[0]))
-
-            for i in range(0, int((part_of_video[j+1] - part_of_video[j]) * fps)):
-
-                if (int(script_infos.comparisons[k][1]) == 1):
-                    if len(image_list1)>1 :
-                        defiler.change_max(len(image_list1[1]), len(image_list2[0]))
-                        img = full_screen_image(image_list1[1][index_list1])
-                        index_list1, index_list2 = defiler.defile(index_list1, index_list2, 1, 0)
-                    else :
-                        defiler.change_max(len(image_list1[0]), len(image_list2[0]))
-                        img = full_screen_image(image_list1[0][index_list1])
-                        index_list1, index_list2 = defiler.defile(index_list1, index_list2, 1, 0)
-                else:
-
-                    if len(image_list2)>1 :
-                        defiler.change_max(len(image_list1[0]), len(image_list2[1]))
-                        img = full_screen_image(image_list2[1][index_list2])
-                        index_list1, index_list2 = defiler.defile(index_list1, index_list2, 0, 1)
-                    else :
-                        defiler.change_max(len(image_list1[0]), len(image_list2[0]))
-                        img = full_screen_image(image_list2[0][index_list2])
-                        index_list1, index_list2 = defiler.defile(index_list1, index_list2, 0, 1)
-
-                img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
-                count_img+=1
-            k+=1
-            index_list1, index_list2 = defiler.reset()
-        j+=1
-    return count_img
-
-def create_video_frames_type2(part_of_video, count_img, image_list1, image_list2, background, script_infos, resolution_video =(1920,1080), folder_video_images = "Temp", fps=30) :
-    j = 0
-    k = 0
-
-    defiler = FrameDefiler("backward", len(image_list1[0][1]), len(image_list2[0][1]))
-    index_list1, index_list2 = defiler.reset()
-
-    while j < len(part_of_video) - 1 and k < len(script_infos.comparisons):
-
-        if j == 0:
-            defiler.change_max(len(image_list1[0][1]), len(image_list2[0][1]))
-            index_list1, index_list2 = defiler.reset()
-            text_to_write = script_infos.perso_gr1[0].split("/")[-1] + "\nVS\n" + script_infos.perso_gr2[0].split("/")[-1]
-            t_start = count_img
-            for i in range(0, (int(part_of_video[1] - part_of_video[0]) * fps)):
-                img = combine_image(image_list1[0][1][index_list1], image_list2[0][1][index_list2], resolution_video)
-                img = add_text_to_image(img, text_to_write, count_img - t_start, resolution_video, start_size=100,
-                                        change_size=False, align="center")
-                img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
-                count_img += 1
-
-                index_list1 , index_list2 = defiler.defile(index_list1, index_list2,1,1)
-
-
-        #Comparison part
-        elif j % 2 == 1:
-            nb_frames = int((part_of_video[j + 1] - part_of_video[j]) * fps)
-            index_perso1 = int(script_infos.comparisons[k][0])
-            index_perso2 = int(script_infos.comparisons[k][1])
-            for i in range(0, nb_frames):
-                t = i/nb_frames
-                img = body_comp_images(image_list1[index_perso1][0][0], image_list2[index_perso2][0][0],t,background,resolution_video)
-                img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
-                count_img += 1
-        #Show winnerPart
+        # Show winnerPart
         else:
-            #Set up the defiler object
-            defiler.change_max(len(image_list1[index_perso1][1]), len(image_list2[index_perso2][1]))
-            index_list1, index_list2 = defiler.reset()
-            for i in range(0, int((part_of_video[j + 1] - part_of_video[j]) * fps)):
-                if (int(script_infos.comparisons[k][2]) == 1):
-                    if len(image_list1) > 1:
-                        img = full_screen_image(image_list1[index_perso1][1][index_list1])
-                        index_list1, index_list2 = defiler.defile(index_list1, index_list2, 1, 0)
-                    else:
-                        img = full_screen_image(image_list1[index_perso1][1][index_list1])
-                        index_list1, index_list2 = defiler.defile(index_list1, index_list2, 1, 0)
-                else:
+            # Set up the defiler object
+            perso_winner = characters_img[int(script_infos.comparisons[k][1])]
 
-                    if len(image_list2) > 1:
-                        img = full_screen_image(image_list2[index_perso2][1][index_list2])
-                        index_list1, index_list2 = defiler.defile(index_list1, index_list2, 0, 1)
-                    else:
-                        img = full_screen_image(image_list2[index_perso2][1][index_list2])
-                        index_list1, index_list2 = defiler.defile(index_list1, index_list2, 0, 1)
+            defiler.change_max(len(perso_winner[2]), 0)
+            index_list1, index_list2 = defiler.reset()
+            nb_frames = int((part_of_video[j + 1] - part_of_video[j]) * fps)
+            for i in range(0, nb_frames):
+                img = full_screen_image(perso_winner[2][index_list1])
+                index_list1, index_list2 = defiler.defile(index_list1, index_list2, 1, 0)
                 img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
                 count_img += 1
             k += 1
-            index_list1 = 0
-            index_list2 = 0
+        j += 1
+
+    return count_img
+
+def create_video_frames_edit2(part_of_video, count_img, characters_img, background, script_infos, resolution_video = (1920,1080)
+                        , folder_video_images = "Temp", fps = 30):
+    j = 0
+    k = 0
+    defiler = FrameDefiler("backward", 0, 0)
+    index_list1, index_list2 = defiler.reset()
+    while j < len(part_of_video) - 1 and k < len(script_infos.comparisons):
+        if j == 0:
+            perso_up = characters_img[int(script_infos.comparisons[0][0])]
+            perso_down = characters_img[int(script_infos.comparisons[0][1])]
+            defiler.change_max(len(perso_up[1]), len(perso_down[1]))
+            index_list1, index_list2 = defiler.reset()
+            text_to_write = script_infos.title[0] + "\n" + script_infos.title[1] + "\n" + script_infos.title[2]
+            t_start = count_img
+            nb_frames = (int(part_of_video[1] - part_of_video[0]) * fps)
+            for i in range(0, nb_frames):
+                img = combine_image(perso_up[1][index_list1], perso_down[1][index_list2], resolution_video)
+                img = add_text_to_image(img, text_to_write, count_img - t_start, resolution_video, start_size=100, change_size=False, align="center")
+                img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
+                count_img += 1
+                index_list1, index_list2 = defiler.defile(index_list1, index_list2, 1, 1)
+        # Comparison part
+        elif j % 2 == 1:
+            perso_left = characters_img[int(script_infos.comparisons[k][0])]
+            perso_right = characters_img[int(script_infos.comparisons[k][1])]
+            nb_frames = int((part_of_video[j + 1] - part_of_video[j]) * fps)
+            for i in range(0, nb_frames):
+                t = i / nb_frames
+                img = body_comp_images(perso_left[0][0], perso_right[0][0], t, background,resolution_video)
+                img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
+                count_img += 1
+        # Show winnerPart
+        else:
+            # Set up the defiler object
+            perso_winner = characters_img[int(script_infos.comparisons[k][2])]
+
+            defiler.change_max(len(perso_winner[2]), 0)
+            index_list1, index_list2 = defiler.reset()
+            nb_frames = int((part_of_video[j + 1] - part_of_video[j]) * fps)
+            for i in range(0, nb_frames):
+                img = full_screen_image(perso_winner[2][index_list1])
+                index_list1, index_list2 = defiler.defile(index_list1, index_list2, 1, 0)
+                img.save(folder_video_images + "/frame" + str(count_img) + ".jpg")
+                count_img += 1
+            k += 1
         j += 1
 
     return count_img

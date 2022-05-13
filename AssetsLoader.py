@@ -6,8 +6,8 @@ def load_image_perso(path_perso, filename) :
     img_perso  = Image.open(path_perso + "/"+filename)
     return img_perso
 
-def load_background(path_background, filename) :
-    img_back = Image.open(path_background + "/" + filename)
+def load_background(filename) :
+    img_back = Image.open(filename)
     return img_back
 
 def load_video_perso(path_perso, vid_name, lenmax=-1) :
