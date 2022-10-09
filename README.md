@@ -7,6 +7,8 @@ or the style of [this video](https://www.youtube.com/shorts/GL-gNR3gBA0)
 
 # Example
 
+![](https://github.com/HugoM25/Anime_Versus_Video_Generator/blob/master/vid1.gif)
+
 # How to use it ?
 
 <h2> Usage </h2>
