@@ -7,7 +7,12 @@ or the style of [this video](https://www.youtube.com/shorts/GL-gNR3gBA0)
 
 # Example
 
-![](https://github.com/HugoM25/Anime_Versus_Video_Generator/blob/master/vid1.gif)
+More videos can be found on this channel : https://www.tiktok.com/@animeversus2022
+
+<p align="center">
+ <img src="https://github.com/HugoM25/Anime_Versus_Video_Generator/blob/master/vid1.gif" alt="animated" />
+  <img src="https://github.com/HugoM25/Anime_Versus_Video_Generator/blob/master/vid2.gif" alt="animated" />
+</p>
 
 # How to use it ?
 
@@ -28,10 +33,44 @@ The available arguments are:
 
 <h2> Setup </h2>
 
-To use this program you will have to use a .txt file containing the script of the video.
-For the moment, this program supports 2 types of edits. 
+<h3> How to organize the database of resources ? </h3>
+
+Here is the way I used to organize my database of characters/songs/backgrounds/scripts (not mandatory) :
+
+
+:file_folder: Res
+
+------->:file_folder: Backgrounds
+
+---------------->:camera:backgrounds_pic.jpg
+
+------->:file_folder: Musique
+
+---------------->:file_folder: Song1
+
+------------------------>:cd: soundtrack.wav
+
+------------------------>:page_with_curl: timestamps.txt
+
+------->:file_folder: Persos
+
+--------------->:file_folder: Character1
+
+------------------------>:camera: body.png
+
+------------------------>:video_camera: vid1.mp4
+
+------------------------>:video_camera: vid2.mp4
+
+------->:file_folder: Scripts
+
+-------------->:page_with_curl: script.txt
+
 
 <h3> How to write a .txt script file ? </h3>
+
+To use this program you will have to use a .txt file containing the script of the video.
+For the moment, this program supports 2 types of edits. 
 
 <h4> Edit Style 1 : </h4>
 
@@ -107,3 +146,6 @@ Zoro VS Demon Slayer Verse
 0 7 0
 ------------------------------------------
 ```
+# Why ?
+
+I have seen many videos with this format (of varying quality). I thought that this format could easily be automated. So I developed this tool which allows to speed up the production of videos while keeping a correct quality constantly.
