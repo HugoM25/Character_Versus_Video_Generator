@@ -105,10 +105,10 @@ python main.py --scriptPath pathToYourTxtFile --resFolder PathToResFolder
 
 The available arguments are: 
 
-- `--fps` : The fps of video
-- `--supptemp` : Contains the decision to delete/backup the temporary files used for the video (by default True)
+- `--fps       ` : The fps of video
+- `--supptemp  ` : Contains the decision to delete/backup the temporary files used for the video (by default True)
 - `--tempFolder` : Path to the folder used to store temporary files
-- `--resFolder` : Path to the folder with the video and images resources
+- `--resFolder ` : Path to the folder with the video and images resources
 - `--scriptPath` : Path to the script to read
 
 
