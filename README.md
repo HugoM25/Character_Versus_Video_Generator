@@ -1,42 +1,68 @@
-# Anime_Versus_VideoGenerator
-Video generator of anime characters comparisons
-
-# What is it ?
-This program is a command line tool to generate videos of anime characters comparisons in the same style as : [this video](https://www.youtube.com/shorts/wQrzgNojzug)
-or the style of [this video](https://www.youtube.com/shorts/GL-gNR3gBA0)
-
-# Example
-
-More videos can be found on this channel : https://www.tiktok.com/@animeversus2022
+<h1 align="center"> Anime Versus VideoGenerator </h1>
 
 <p align="center">
- <img src="https://github.com/HugoM25/Anime_Versus_Video_Generator/blob/master/vid1.gif" alt="animated" />
+  <img src="https://github.com/HugoM25/Anime_Versus_Video_Generator/blob/master/vid1.gif" alt="animated" />
   <img src="https://github.com/HugoM25/Anime_Versus_Video_Generator/blob/master/vid2.gif" alt="animated" />
 </p>
 
-# How to use it ?
 
-<h2> Usage </h2>
-To use this program you can use a command like this :
+<!-- Table of Contents -->
+# Table of Contents
+- [About the Project](#about-the-project)
+  * [Context](#context)
+  * [Made with](#made-with)
+  * [Features](#features)
+- [Getting Started](#getting-started)
+  * [Prerequisites](#prerequisites)
+  * [Installation](#installation)
+  * [Files required](#files-required)
+- [Usage](#usage)
+  * [Commands](#commands)
+  * [Scripts Writing](#scripts-writing)
+     - [First Edit Style](#first-edit-style)
+     - [Second Edit Style](#second-edit-style)
+- [Examples](#examples)
+- [License](#license)
+- [Author](#author)
 
-```Shell
-python main.py --scriptPath pathToYourTxtFile --resFolder PathToResFolder
-```
+# About the project 
 
-The available arguments are: 
 
-- `--fps` : The fps of video
-- `--supptemp` : Contains the decision to delete/backup the temporary files used for the video (by default True)
-- `--tempFolder` : Path to the folder used to store temporary files
-- `--resFolder` : Path to the folder with the video and images resources
-- `--scriptPath` : Path to the script to read
 
-<h2> Setup </h2>
+## Context
 
-<h3> How to organize the database of resources ? </h3>
+I was looking for a way to automate the creation of "shorts" type content that can be found on Youtube, Instagram, Tiktok. I discovered the format of "versus", the videos all had slightly different shapes and some looked so basic that a computer could have made them. I found the concept very simple to automate and mass produce so I made this program.
+
+## Made with 
+
+The project has been made 100% in python.
+
+## Features 
+
+This program is a command line tool to generate videos of anime characters comparisons in the same style as : [this video](https://www.youtube.com/shorts/wQrzgNojzug)
+or the style of [this video](https://www.youtube.com/shorts/GL-gNR3gBA0)
+
+# Examples
+
+More videos can be found on this channel : https://www.tiktok.com/@animeversus2022
+
+
+# Getting Started
+
+ ## Prerequisites
+ 
+ In order to use the program you will need to have a python 3.X interpretor installed. 
+ The required libraries are listed in the [requirements.txt]() file. 
+ 
+ ## Installation 
+ 
+ 1. Clone the project and unzip it.
+ 2. Install the librairies listed in [requirements.txt]()
+ 
+
+## Files required 
 
 Here is the way I used to organize my database of characters/songs/backgrounds/scripts (not mandatory) :
-
 
 :file_folder: Res
 
@@ -67,14 +93,37 @@ Here is the way I used to organize my database of characters/songs/backgrounds/s
 -------------->:page_with_curl: script.txt
 
 
-<h3> How to write a .txt script file ? </h3>
+# Usage 
+
+## Commands 
+
+To use this program you can use a command like this :
+
+```Shell
+python main.py --scriptPath pathToYourTxtFile --resFolder PathToResFolder
+```
+
+The available arguments are: 
+
+- `--fps` : The fps of video
+- `--supptemp` : Contains the decision to delete/backup the temporary files used for the video (by default True)
+- `--tempFolder` : Path to the folder used to store temporary files
+- `--resFolder` : Path to the folder with the video and images resources
+- `--scriptPath` : Path to the script to read
+
+
+## Scripts Writing
 
 To use this program you will have to use a .txt file containing the script of the video.
+To write comments in the script start the line you want to comment with `//`.
+
 For the moment, this program supports 2 types of edits. 
 
-<h4> Edit Style 1 : </h4>
+### First Edit Style 
 
-```
+This is an example script .txt file using Sanji and Luffy (from wano arc) to show how to write a script in the first edit style 
+
+```txt
 //DO NOT REMOVE ----- characters
 //Comments are written using "//" 
 //Configuration Line
@@ -107,7 +156,11 @@ OVERALL 0
 ------------------------------------------
 ```
 
-<h4> Edit Style 2 : </h4>
+### Second Edit Style 
+
+
+This is an example script .txt file using Zoro and multiple characters from Demon Slayer to show how to write a script for in the second edit style 
+
 
 ```
 //DO NOT REMOVE ----- characters
@@ -146,6 +199,12 @@ Zoro VS Demon Slayer Verse
 0 7 0
 ------------------------------------------
 ```
-# Why ?
 
-I have seen many videos with this format (of varying quality). I thought that this format could easily be automated. So I developed this tool which allows to speed up the production of videos while keeping a correct quality constantly.
+# License
+
+Distributed under the MIT License. 
+
+# Author 
+
+- [@HugoM25](https://github.com/HugoM25)
+
